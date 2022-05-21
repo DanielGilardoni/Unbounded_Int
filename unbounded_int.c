@@ -116,7 +116,7 @@ char *unbounded_int2string(unbounded_int i){
         printf("echec du passage en string");
         exit(1);
     }
-    if(i.signe !='+' && i.signe != '-'){
+    if(i.signe =='*'){
         s[0]='*';
         s[1]='\0';
         return s;
@@ -135,15 +135,8 @@ char *unbounded_int2string(unbounded_int i){
 
 }
 
-/*
-int main(){
-    unbounded_int u = string2unbounded_int("-125");
-    unbounded_int ui = string2unbounded_int("az-125");
-    long long i = 102568;
-    unbounded_int ul = ll2unbounded_int(i);
-    free_unbounded_int(u);
-    free_unbounded_int(ui);
-    free_unbounded_int(ul);
-
-    return 0;
-}*/
+int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
+    if(a.signe == '*' || b.signe == '*')
+        return 0;
+    
+}

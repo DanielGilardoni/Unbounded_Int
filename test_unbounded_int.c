@@ -7,7 +7,7 @@
 #include "unbounded_int.h"
 
 void afficher(unbounded_int u){//Maintenant qu'on a la conversion en string on pourrait juste convertir en string et afficher
-    if(u.signe!='+' && u.signe != '-'){
+    if(u.signe=='*'){
         printf("echec, le signe est : '*'");
         return;
     }
