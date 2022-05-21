@@ -116,7 +116,7 @@ char *unbounded_int2string(unbounded_int i){
         printf("echec du passage en string");
         exit(1);
     }
-    if(i.signe =='*'){
+    if(i.signe !='+' && i.signe != '-'){
         s[0]='*';
         s[1]='\0';
         return s;
@@ -136,7 +136,29 @@ char *unbounded_int2string(unbounded_int i){
 }
 
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
-    if(a.signe == '*' || b.signe == '*')
+    if((a.signe != '-' && a.signe != '+') || (b.signe != '-' && b.signe != '+'))
         return 0;
+    if(a.signe != b.signe){
+        if(a.signe == '-'){
+            return -1;
+        }
+        return 1;
+    }
+    chiffre *curr_a = a.premier;
+    chiffre *curr_b = b.premier;
+    if(a.len != b.len){
+        if(a.len<b.len)
+            return -1;
+        return 1;
+    }
+    while(curr_a != NULL){
+        if(curr_a->c < curr_b->c)
+            return -1;
+        if(curr_a->c > curr_b->c)
+            return 1;
+        curr_a = curr_a->suivant;
+        curr_b = curr_b->suivant;
+    }
+    return 0;
     
 }
