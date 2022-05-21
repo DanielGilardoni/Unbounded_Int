@@ -48,7 +48,7 @@ unbounded_int string2unbounded_int(const char *e){
             return u;
         }
     }
-    e=e-u.len;
+    e-=u.len;
     u.premier = malloc(sizeof(chiffre));
     if(u.premier == NULL){
         u.signe = '*';
@@ -95,18 +95,15 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
         u.signe = '*';
         return u;
     }
-    long_s += count;
-    *long_s = '\0';
-    long_s--;
+    long_s[count] = '\0';
     a = i;
-    for(;count>0;count--){
+    count--;
+    for(;count>=0;count--){
         //printf("b : %d\n",b);
-        *long_s = (char)(b+'0');
+        long_s[count] = (char)(b+'0');
         //printf("long_s : %c\n", *long_s);
         a = a/10;
         b = a%10;
-        if(a != 0)
-            long_s--;//Sinon à la derniére iteration de la boucle on revient trop en arriére je crois
     }
     //printf("%s",long_s);
     return string2unbounded_int(long_s);
@@ -120,27 +117,20 @@ char *unbounded_int2string(unbounded_int i){
         exit(1);
     }
     if(i.signe !='+' && i.signe != '-'){
-        *s='*';
-        s++;
-        *s='\0';
-        s-=1;
+        s[0]='*';
+        s[1]='\0';
         return s;
     }
     if(i.signe=='+'){
-        *s='+';
-        s++;
+        s[0]='+';
     }else{
-        *s='-';
-        s++;
+        s[0]='-';
     }
     chiffre *current = i.premier;
-    while(current != NULL){
-        *s=current->c;
-        s++;
-        current = current->suivant;
+    for(int j =1;current !=NULL && j<=i.len;current=current->suivant, j++){
+        s[j]=current->c;
     }
-    *s='\0';
-    s-=i.len+1;
+    s[i.len+1]='\0';
     return s;
 
 }
