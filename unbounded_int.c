@@ -77,7 +77,13 @@ unbounded_int string2unbounded_int(const char *e){
 }
 
 unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded directe
-    long long a = i;
+    char c = '+';
+    long long a;
+    if(i<0){
+        c = '-';
+        a = i*(-1);
+    } else 
+        a = i;
     int b = a%10;
     long count = 0;
     //printf("\n");
@@ -88,19 +94,23 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
     }while(a>=10);//on compte le nombre de chiffres dans i
     count++;//Sinon on ne prends pas en compte le dernier chiffre 
     //printf("count : %ld\n",count);
-    char *long_s = malloc(sizeof(char)*count+1);//+1 pour mettre '\0'
+    char *long_s = malloc(sizeof(char)*count+2);//+1 pour mettre le signe et '\0'
     if(long_s == NULL){
         //printf("yo");
         unbounded_int u;
         u.signe = '*';
         return u;
     }
-    long_s[count] = '\0';
-    a = i;
+    long_s[0] = c;
+    long_s[count+1] = '\0';
+    if(i<0)
+        a = i*(-1);
+    else
+        a = i;
     count--;
     for(;count>=0;count--){
         //printf("b : %d\n",b);
-        long_s[count] = (char)(b+'0');
+        long_s[count+1] = (char)(b+'0');
         //printf("long_s : %c\n", *long_s);
         a = a/10;
         b = a%10;
@@ -161,4 +171,9 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
     }
     return 0;
     
+}
+
+int unbounded_int_cmp_ll(unbounded_int a, long long b){
+    unbounded_int c = ll2unbounded_int(b);
+    return unbounded_int_cmp_unbounded_int(a,c);
 }
