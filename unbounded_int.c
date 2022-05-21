@@ -112,6 +112,39 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
     return string2unbounded_int(long_s);
 }
 
+
+char *unbounded_int2string(unbounded_int i){
+    char *s = malloc(i.len+2);//le nombre de chiffre + le signe + '\0'
+    if(s == NULL){
+        printf("echec du passage en string");
+        exit(1);
+    }
+    if(i.signe !='+' && i.signe != '-'){
+        *s='*';
+        s++;
+        *s='\0';
+        s-=1;
+        return s;
+    }
+    if(i.signe=='+'){
+        *s='+';
+        s++;
+    }else{
+        *s='-';
+        s++;
+    }
+    chiffre *current = i.premier;
+    while(current != NULL){
+        *s=current->c;
+        s++;
+        current = current->suivant;
+    }
+    *s='\0';
+    s-=i.len+1;
+    return s;
+
+}
+
 /*
 int main(){
     unbounded_int u = string2unbounded_int("-125");

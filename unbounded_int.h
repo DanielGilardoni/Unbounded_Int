@@ -21,4 +21,6 @@ unbounded_int string2unbounded_int(const char *e);
 
 unbounded_int ll2unbounded_int(long long i);
 
+char *unbounded_int2string(unbounded_int i);
+
 #endif
