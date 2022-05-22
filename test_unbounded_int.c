@@ -46,7 +46,7 @@ int main(void) {
 
     //test de comparaison entre 2 unbounded_int :
     printf("\ntest de comparaison entre 2 unbounded_int :\n");
-    int res;
+    int res = 0;
     res = unbounded_int_cmp_unbounded_int(u,ul);
     printf("%d\n", res);
     res = unbounded_int_cmp_unbounded_int(ul,u);
@@ -65,10 +65,45 @@ int main(void) {
     res = unbounded_int_cmp_ll(ul, -9876543210);
     printf("%d\n", res);
 
+    /*//test de somme entre 2 unbounded_int positifs :
+    printf("\ntest de somme entre 2 unbounded_int positifs :\n");
+    unbounded_int sum = unbounded_int_somme_positive(u,ul);
+    afficherBis(sum);
+    printf("%s", unbounded_int2string(sum));*/
+
+    /*//test de difference entre 2 unbounded_int avec a >= b :
+    printf("\ntest de difference entre 2 unbounded_int positifs avec a >= b :\n");
+    unbounded_int diff = unbounded_int_difference_positive(ul,u);
+    printf("%s", unbounded_int2string(diff));*/
+
+    //test de somme entre 2 unbounded_int :
+    printf("\ntest de somme entre 2 unbounded_int :\n");
+    unbounded_int somme = unbounded_int_somme(u,ui);
+    printf("%s\n", unbounded_int2string(somme));//*
+    somme = unbounded_int_somme(u,ul);
+    printf("%s\n", unbounded_int2string(somme));//9876543085
+    somme = unbounded_int_somme(ul,u);
+    printf("%s\n", unbounded_int2string(somme));//9876543085
+    somme = unbounded_int_somme(u,u);
+    printf("%s\n", unbounded_int2string(somme));//-259
+
+    //test de difference entre 2 unbounded_int :
+    printf("\ntest de difference entre 2 unbounded_int :\n");
+    unbounded_int difference = unbounded_int_difference(u,ui);
+    printf("%s\n", unbounded_int2string(difference));//*
+    difference = unbounded_int_difference(u,ul);
+    printf("%s\n", unbounded_int2string(difference));//-987654335
+    difference = unbounded_int_difference(ul,u);
+    printf("%s\n", unbounded_int2string(difference));//987654335
+    difference = unbounded_int_difference(u,u);
+    printf("%s\n", unbounded_int2string(difference));//0
+
 
     free_unbounded_int(u);
     free_unbounded_int(ui);
     free_unbounded_int(ul);
+    free_unbounded_int(somme);
+    free_unbounded_int(difference);
     
     return EXIT_SUCCESS;
 }

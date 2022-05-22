@@ -94,7 +94,7 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
     }while(a>=10);//on compte le nombre de chiffres dans i
     count++;//Sinon on ne prends pas en compte le dernier chiffre 
     //printf("count : %ld\n",count);
-    char *long_s = malloc(sizeof(char)*count+2);//+1 pour mettre le signe et '\0'
+    char *long_s = malloc(count+2);//+1 pour mettre le signe et '\0'
     if(long_s == NULL){
         //printf("yo");
         unbounded_int u;
@@ -110,7 +110,7 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
     count--;
     for(;count>=0;count--){
         //printf("b : %d\n",b);
-        long_s[count+1] = (char)(b+'0');
+        long_s[count+1] = b+'0';
         //printf("long_s : %c\n", *long_s);
         a = a/10;
         b = a%10;
@@ -154,13 +154,13 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
         }
         return 1;
     }
-    chiffre *curr_a = a.premier;
-    chiffre *curr_b = b.premier;
     if(a.len != b.len){
         if(a.len<b.len)
             return -1;
         return 1;
     }
+    chiffre *curr_a = a.premier;
+    chiffre *curr_b = b.premier;
     while(curr_a != NULL){
         if(curr_a->c < curr_b->c)
             return -1;
@@ -176,4 +176,321 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
 int unbounded_int_cmp_ll(unbounded_int a, long long b){
     unbounded_int c = ll2unbounded_int(b);
     return unbounded_int_cmp_unbounded_int(a,c);
+}
+
+unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
+    unbounded_int u;
+    u.signe = '+';
+    int a_ch, b_ch = 0;
+    int len = 0;
+    int res = 0;
+    int retenue = 0;
+    
+    chiffre *curr_c;
+    chiffre *prev_c = NULL;
+    chiffre *curr_a = a.dernier;
+    chiffre *curr_b = b.dernier;
+    while(curr_a != NULL && curr_b !=NULL){
+        //printf("\nla retenue : %d\n", retenue);
+        //printf("debut");
+        len++;
+        a_ch = curr_a->c - '0';
+        b_ch = curr_b->c - '0';
+        res = a_ch + b_ch + retenue;
+        //printf("\nle res est : %d\n", res);
+        curr_c = malloc(sizeof(chiffre));
+        if(curr_c == NULL){
+            u.signe = '*';
+            return u;
+        }
+        if(curr_a == a.dernier){//au premier tour de boucle pour set u.dernier
+            u.dernier = curr_c;
+        }
+        if(res<10){
+            curr_c->c = res+'0';
+            retenue = 0;
+        }else{
+            retenue = 1;
+            res = res-10;
+            curr_c->c = res+'0';
+        }
+        curr_c->suivant = prev_c;
+        if(prev_c != NULL){
+            prev_c->precedent = curr_c;
+        }
+        //printf("%c %c", curr_a->c, curr_b->c);
+        prev_c = curr_c;
+        curr_a = curr_a->precedent;
+        curr_b = curr_b->precedent;
+    }
+    if(a.len - len ==b.len - len){//si on a tout parcouru
+        if(retenue > 0){
+            len++;
+            curr_c = malloc(sizeof(chiffre));
+            if(curr_c == NULL){
+                u.signe = '*';
+                return u;
+            }
+            curr_c->c = retenue+'0';
+            curr_c->suivant = prev_c;
+            prev_c->precedent = curr_c;
+            u.premier = curr_c;
+        }else
+            u.premier = prev_c;
+        u.len = len;
+        return u;
+    }
+    if(a.len > len){
+        while(curr_a != NULL){
+            len++;
+            a_ch = curr_a->c -'0';
+            res = a_ch + retenue;
+            curr_c = malloc(sizeof(chiffre));
+            if(curr_c == NULL){
+                u.signe = '*';
+                return u;
+            }
+            if(res<10){
+                curr_c->c = res+'0';
+                retenue = 0;
+            }else{
+                retenue = retenue;
+                res = res-10;
+                curr_c->c = res+'0';
+            }
+            curr_c->suivant = prev_c;
+            if(prev_c != NULL){
+                prev_c->precedent = curr_c;
+            }
+            prev_c = curr_c;
+            curr_a = curr_a->precedent;
+        }
+        if(retenue > 0){
+            len++;
+            curr_c = malloc(sizeof(chiffre));
+            if(curr_c == NULL){
+                u.signe = '*';
+                return u;
+            }
+            curr_c->c = retenue+'0';
+            curr_c->suivant = prev_c;
+            prev_c->precedent = curr_c;
+            u.premier = curr_c;
+        }else
+            u.premier = prev_c;
+        u.len = len;
+        return u;
+    }
+    while(curr_b != NULL){
+        //printf("\nla retenue : %d\n", retenue);
+        len++;
+        b_ch = curr_b->c - '0';
+        res = b_ch + retenue;
+        curr_c = malloc(sizeof(chiffre));
+        if(curr_c == NULL){
+            u.signe = '*';
+            return u;
+        }
+        if(res<10){
+            retenue = 0;
+            curr_c->c = res + '0';
+            //printf("\nle bail est %c", curr_c->c);
+        }else{
+            retenue = 1;
+            res = res-10;
+            curr_c->c = res+'0';
+        }
+        curr_c->suivant = prev_c;
+        if(prev_c != NULL){
+            prev_c->precedent = curr_c;
+        }
+        prev_c = curr_c;
+        curr_b = curr_b->precedent;
+    }
+    if(retenue > 0){
+        len++;
+        curr_c = malloc(sizeof(chiffre));
+        if(curr_c == NULL){
+            u.signe = '*';
+            return u;
+        }
+        curr_c->c = retenue+'0';
+        curr_c->suivant = prev_c;
+        prev_c->precedent = curr_c;
+        u.premier = curr_c;
+    }else
+        u.premier = curr_c;
+    u.len = len;
+    //printf("\n%c  %c\n", u.premier->c, curr_c->c);
+    return u;
+}
+
+unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int b){//on considére que la fonction est bien appelé avec a et b positifs et avec a>b
+    unbounded_int u;
+    u.signe = '+';
+    int a_ch, b_ch = 0;
+    int len = 0;
+    int res = 0;
+    int retenue = 0;
+    
+    chiffre *curr_c;
+    chiffre *prev_c = NULL;
+    chiffre *curr_a = a.dernier;
+    chiffre *curr_b = b.dernier;
+    while(curr_a != NULL && curr_b !=NULL){
+        //printf("\nla retenue : %d\n", retenue);
+        //printf("debut");
+        len++;
+        a_ch = curr_a->c - '0';
+        b_ch = curr_b->c - '0';
+        b_ch += retenue;
+        if(a_ch >= b_ch){
+            retenue = 0;
+        }else {
+            a_ch += 10;
+            retenue = 1;
+        }
+        res = a_ch - b_ch;
+        //printf("\nle res est : %d\n", res);
+        curr_c = malloc(sizeof(chiffre));
+        if(curr_c == NULL){
+            u.signe = '*';
+            return u;
+        }
+        if(curr_a == a.dernier){//au premier tour de boucle pour set u.dernier
+            u.dernier = curr_c;
+        }
+        curr_c->c = res+'0';
+        curr_c->suivant = prev_c;
+        if(prev_c != NULL){
+            prev_c->precedent = curr_c;
+        }
+        //printf("%c %c", curr_a->c, curr_b->c);
+        prev_c = curr_c;
+        curr_a = curr_a->precedent;
+        curr_b = curr_b->precedent;
+    }
+    if(a.len - len ==b.len - len){//si on a tout parcouru
+        u.premier = prev_c;
+        u.len = len;
+        return u;
+    }//Sinon il faut parcourir la fin de a qui est plus grand
+    while(curr_a != NULL){
+        //printf("\nla retenue : %d\n", retenue);
+        len++;
+
+        a_ch = curr_a->c - '0';
+        if(a_ch >= retenue){//si la retenue vaut 0 ou si a_ch est >= 1
+            retenue = 0;
+            res = a_ch - retenue;
+        }else {//si la retenue vaut 1 et a_ch 0
+            res = 9;
+            retenue = 1;
+        }
+        curr_c = malloc(sizeof(chiffre));
+        if(curr_c == NULL){
+            u.signe = '*';
+            return u;
+        }
+        curr_c->c = res+'0';
+        curr_c->suivant = prev_c;
+        if(prev_c != NULL){
+            prev_c->precedent = curr_c;
+        }
+        prev_c = curr_c;
+        curr_a = curr_a->precedent;
+    }
+    u.premier = curr_c;
+    u.len = len;
+    //printf("\n%c  %c\n", u.premier->c, curr_c->c);
+    return u;
+}   
+
+unbounded_int remove_zero(unbounded_int u){//cette fonction doit enlever les 0 inutiles
+    if(u.signe != '-' && u.signe != '+'){
+        return u;
+    }
+    chiffre* current;
+    while(u.premier->c == '0' && u.premier != u.dernier){
+        u.len--;
+        current = u.premier;
+        u.premier = u.premier->suivant;
+        u.premier->precedent = NULL;
+        free(current);
+    }
+    return u;
+}
+
+unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b){
+    unbounded_int sum;
+    if((a.signe != '-' && a.signe != '+') || (b.signe != '-' && b.signe != '+')){
+        sum.signe = '*';
+        return sum;
+    }
+    int res = unbounded_int_cmp_unbounded_int(a,b);
+    if(a.signe == '+' && b.signe == '+'){
+        sum = unbounded_int_somme_positive(b,a);
+        sum.signe = '+';
+    }else if(a.signe == '-' && b.signe == '-'){
+        sum = unbounded_int_somme_positive(b,a);
+        sum.signe = '-';
+    }else if(a.signe == '-'){
+        a.signe = '+';
+        res = unbounded_int_cmp_unbounded_int(a,b);
+        if(res == -1){
+            sum = unbounded_int_difference_positive(b,a);
+            sum.signe = '+';
+        }else{
+            sum = unbounded_int_difference_positive(a,b);
+            sum.signe = '-';
+        }
+        a.signe = '-';
+    }else{
+        b.signe = '+';
+        res = unbounded_int_cmp_unbounded_int(a,b);
+        if(res == -1){
+            sum = unbounded_int_difference_positive(b,a);
+            sum.signe = '-';
+        }else{
+            sum = unbounded_int_difference_positive(a,b);
+            sum.signe = '+';
+        }
+        b.signe = '-';
+    }
+    sum = remove_zero(sum);
+    return sum;
+}
+
+unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b){
+    unbounded_int diff;
+    if((a.signe != '-' && a.signe != '+') || (b.signe != '-' && b.signe != '+')){
+        diff.signe = '*';
+        return diff;
+    }
+    int res = unbounded_int_cmp_unbounded_int(a,b);
+    if(a.signe == '+' && b.signe == '+'){
+        if(res == -1){//si a < b
+            diff = unbounded_int_difference_positive(b,a);
+            diff.signe = '-';
+        }else{
+            diff = unbounded_int_difference_positive(a,b);
+            diff.signe = '+';
+        }
+    }else if(a.signe == '-' && b.signe == '-'){
+        if(res == -1){
+            diff = unbounded_int_difference_positive(a,b);
+            diff.signe = '-';
+        }else{
+            diff = unbounded_int_difference_positive(b,a);
+            diff.signe = '+';
+        }
+    }else if(a.signe == '-'){
+        diff.signe = '-';
+        diff = unbounded_int_somme_positive(a,b);
+    }else{
+        diff.signe = '+';
+        diff = unbounded_int_somme_positive(a,b);
+    }
+    diff = remove_zero(diff);
+    return diff;
 }
