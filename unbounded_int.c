@@ -86,17 +86,13 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
         a = i;
     int b = a%10;
     long count = 0;
-    //printf("\n");
     do{
         count++;
         a= a/10;
-        //printf("a : %lld\n", a);
     }while(a>=10);//on compte le nombre de chiffres dans i
     count++;//Sinon on ne prends pas en compte le dernier chiffre 
-    //printf("count : %ld\n",count);
     char *long_s = malloc(count+2);//+1 pour mettre le signe et '\0'
     if(long_s == NULL){
-        //printf("yo");
         unbounded_int u;
         u.signe = '*';
         return u;
@@ -109,13 +105,10 @@ unbounded_int ll2unbounded_int(long long i){//Sinon transformer en unbounded dir
         a = i;
     count--;
     for(;count>=0;count--){
-        //printf("b : %d\n",b);
         long_s[count+1] = b+'0';
-        //printf("long_s : %c\n", *long_s);
         a = a/10;
         b = a%10;
     }
-    //printf("%s",long_s);
     return string2unbounded_int(long_s);
 }
 
@@ -124,7 +117,7 @@ char *unbounded_int2string(unbounded_int i){
     char *s = malloc(i.len+2);//le nombre de chiffre + le signe + '\0'
     if(s == NULL){
         printf("echec du passage en string");
-        exit(1);
+        return "*";
     }
     if(i.signe !='+' && i.signe != '-'){
         s[0]='*';
@@ -147,7 +140,7 @@ char *unbounded_int2string(unbounded_int i){
 
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b){
     if((a.signe != '-' && a.signe != '+') || (b.signe != '-' && b.signe != '+'))
-        return 0;
+        return -2;
     if(a.signe != b.signe){
         if(a.signe == '-'){
             return -1;
@@ -178,7 +171,7 @@ int unbounded_int_cmp_ll(unbounded_int a, long long b){
     return unbounded_int_cmp_unbounded_int(a,c);
 }
 
-unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
+unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){//on considére que a et b sont positifs et bien définis
     unbounded_int u;
     u.signe = '+';
     int a_ch, b_ch = 0;
@@ -191,13 +184,10 @@ unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
     chiffre *curr_a = a.dernier;
     chiffre *curr_b = b.dernier;
     while(curr_a != NULL && curr_b !=NULL){
-        //printf("\nla retenue : %d\n", retenue);
-        //printf("debut");
         len++;
         a_ch = curr_a->c - '0';
         b_ch = curr_b->c - '0';
         res = a_ch + b_ch + retenue;
-        //printf("\nle res est : %d\n", res);
         curr_c = malloc(sizeof(chiffre));
         if(curr_c == NULL){
             u.signe = '*';
@@ -218,7 +208,6 @@ unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
         if(prev_c != NULL){
             prev_c->precedent = curr_c;
         }
-        //printf("%c %c", curr_a->c, curr_b->c);
         prev_c = curr_c;
         curr_a = curr_a->precedent;
         curr_b = curr_b->precedent;
@@ -282,7 +271,6 @@ unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
         return u;
     }
     while(curr_b != NULL){
-        //printf("\nla retenue : %d\n", retenue);
         len++;
         b_ch = curr_b->c - '0';
         res = b_ch + retenue;
@@ -294,7 +282,6 @@ unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
         if(res<10){
             retenue = 0;
             curr_c->c = res + '0';
-            //printf("\nle bail est %c", curr_c->c);
         }else{
             retenue = 1;
             res = res-10;
@@ -321,7 +308,6 @@ unbounded_int unbounded_int_somme_positive(unbounded_int a, unbounded_int b){
     }else
         u.premier = curr_c;
     u.len = len;
-    //printf("\n%c  %c\n", u.premier->c, curr_c->c);
     return u;
 }
 
@@ -338,8 +324,6 @@ unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int 
     chiffre *curr_a = a.dernier;
     chiffre *curr_b = b.dernier;
     while(curr_a != NULL && curr_b !=NULL){
-        //printf("\nla retenue : %d\n", retenue);
-        //printf("debut");
         len++;
         a_ch = curr_a->c - '0';
         b_ch = curr_b->c - '0';
@@ -351,7 +335,6 @@ unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int 
             retenue = 1;
         }
         res = a_ch - b_ch;
-        //printf("\nle res est : %d\n", res);
         curr_c = malloc(sizeof(chiffre));
         if(curr_c == NULL){
             u.signe = '*';
@@ -365,7 +348,6 @@ unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int 
         if(prev_c != NULL){
             prev_c->precedent = curr_c;
         }
-        //printf("%c %c", curr_a->c, curr_b->c);
         prev_c = curr_c;
         curr_a = curr_a->precedent;
         curr_b = curr_b->precedent;
@@ -376,7 +358,6 @@ unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int 
         return u;
     }//Sinon il faut parcourir la fin de a qui est plus grand
     while(curr_a != NULL){
-        //printf("\nla retenue : %d\n", retenue);
         len++;
 
         a_ch = curr_a->c - '0';
@@ -402,7 +383,6 @@ unbounded_int unbounded_int_difference_positive( unbounded_int a, unbounded_int 
     }
     u.premier = curr_c;
     u.len = len;
-    //printf("\n%c  %c\n", u.premier->c, curr_c->c);
     return u;
 }   
 
@@ -494,3 +474,28 @@ unbounded_int unbounded_int_difference( unbounded_int a, unbounded_int b){
     diff = remove_zero(diff);
     return diff;
 }
+
+/*unbounded_int unbounded_int_produit( unbounded_int a, unbounded_int b){
+    char *str_a = unbounded_int2string(a);
+    char *str_b = unbounded_int2string(b);
+    str_a++;
+    str_b++;
+    int n = strlen(str_a);
+    int m = strlen(str_b);
+    char *str_c = calloc(m + n + 1,1);
+    int i=0;
+    int r=0;
+    for( int j = 0; j < m; j++){ 
+        r = 0;
+        if( str_b[j] == '0' )
+            continue;
+        for(i=0; i < n; i++ ){ 
+            int v = str_c[i+j]-'0' + (str_a[i]+'0')*(str_b[j]+'0') + r;
+            str_c[i+j] = (v % 10)+'0';
+            r = v / 10;
+            printf(" la : %c\n", str_c[i+j]);
+        }
+        str_c[j+n] = r+'0';
+    }
+    return string2unbounded_int(str_c);
+}*/
